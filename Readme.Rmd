@@ -1,0 +1,25 @@
+---
+title: "Readme"
+author: "Claus Walter"
+date: "7 Juni 2017"
+output: html_document
+---
+
+## General Comment on the file repository
+
+What you find in this repository all served the purpose of creating this Shiny app: <https://clauswalter.shinyapps.io/DataScienceCapstoneApplication/>. However, please note the following: I cleaned up the original repository quite a lot. So in this repository, you will in most cases **not** find the input and output files I used resp. created in the right sub-folders. Reason is that I cleaned up the whole structure before putting it to Github, so it is easier to focus on the main contents I created and used.
+
+## Processing Steps and what to find where
+
+To realize the app, I chose to separate the following four steps in terms of separate R programs:
+
+1. **Data extraction, exploration and n-gram derivation:** This was the programming that was necessary to achieve the first milestone of the project. As part of this, I extracted the Swiftkey Twitter, Blog and News data files, did some first data cleansing and analysis. This produced some first data files (n-grams of different length) which still contained e.g. unwanted characters etc., but which allowed to get a first idea of what might, and what might not be feasible in the context of text prediction. For these steps, I used the recommended packages of "tm" and "RWeka" alongside many other useful packages which are not that specific to word processing.
+
+2. **Advanced data cleansing and preparation:** Not being fully satisfied with the results of especially the "tm" package, I programmed some functions for further data cleansing (e.g. elimination of certain special characters that came into my way), unstemming (very fast) and bringing interpunctuation back (e.g. thats -> that's). Furthermore, I experimented with runtime efficiency by deciding how much of the Swiftkey input files I could use - I went for 5%, and how much of the processed output to best use. I decided to cut out the low frequency terms, which to me were all hits below a frequency of 20 hits. That means that if a term is found generelly less than 20 times in total in text bodies provided by Swiftkey, I cut it out. Simple reasonig behind this: if it is not frequently used, it is not that helpful to predict words. Having these files as the output of step 2 allowed me to proceed to the next step.
+
+3. **Application logic programming in R and Shiny:** First, I process the input string given: cut the input string into single terms (mostly English words), convert into lower case, eliminate special characters, stem etc. So basically the same steps I used on the Swiftkey input. Having done that, the logic would look for similarities in all n-grams that are applicable. So if e.g. two words are put in, the logic would start searching in the 3-gram and 2-gram tables. In case of the 3-gram table, the first two arguments (words) would be used like a primary key, the third column would be the potential prediction. Same for the 2-gram, where only the last input word would be used as primary key. The second word of the 2-gram table would be the potential prediction. The same would be done with the personalized n-grams. Here, the simple approach is that any user input would be put as-is into n-gram tables. Maximum input length used for this would be four words. All the matches determied are written into a joint table ("dfStatistics"), which is displayed in tab "Prediction Details and History". How to interpret the tables used is explained in the next section. For the most promising word predicted, I execute steps such as unstemming before displaying it in the output field. If no match can be dertmined, the most frequently used words in the English language are set as default values.
+
+4. **Application logic programming in R and Shiny:** I put the Shiny app (server and UI files plus associated documentation) into a separate folder. Basically, there is nothing complicated about it. A remark on the file paths used in the server program: the absolute files work on my development machine, but not on the Shiny server. I corrected that before I loaded the app to Shiny.io, but I didn't find it worthwhile to upload the intermediate version to Github.
+
+The above is basically reflected in the sub-folder structure I created. The few files you find in the main folder should be quite self-explaining. I hope it is good enough so you have a chance to understand how I did the data processing and set up the application as such :-)
+

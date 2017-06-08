@@ -1,0 +1,63 @@
+---
+title: "Advanced Documentation"
+author: "Claus Walter"
+date: "7 Juni 2017"
+output: html_document
+---
+
+## Introduction
+
+This section of the documentation adds to the more general user-documentation which can be found under tab "How to use". So please read this more general part of the documentation first, since it is not repeated in this document. This document explains the application in the broader sense, and it allows you to directly link into the R-code, data files etc. stored in Github (see hyperlink at the bottom). Have fun! :-)
+
+## Data Processing Steps
+
+To realize the app, I chose to separate the following three steps in terms of separate R programs:
+
+1. **Data extraction, exploration and n-gram derivation:** This was the programming that was necessary to achieve the first milestone of the project. As part of this, I extracted the Swiftkey Twitter, Blog and News data files, did some first data cleansing and analysis. This produced some first data files (n-grams of different length) which still contained e.g. unwanted characters etc., but which allowed to get a first idea of what might, and what might not be feasible in the context of text prediction. For these steps, I used the recommended packages of "tm" and "RWeka" alongside many other useful packages which are not that specific to word processing.
+
+2. **Advanced data cleansing and preparation:** Not being fully satisfied with the results of especially the "tm" package, I programmed some functions for further data cleansing (e.g. elimination of certain special characters that came into my way), unstemming (very fast) and bringing interpunctuation back (e.g. thats -> that's). Furthermore, I experimented with runtime efficiency by deciding how much of the Swiftkey input files I could use - I went for 5%, and how much of the processed output to best use. I decided to cut out the low frequency terms, which to me were all hits below a frequency of 20 hits. That means that if a term is found generelly less than 20 times in total in text bodies provided by Swiftkey, I cut it out. Simple reasonig behind this: if it is not frequently used, it is not that helpful to predict words. Having these files as the output of step 2 allowed me to proceed to the next step.
+
+3. **Application logic programming in R and Shiny:** First, I process the input string given: cut the input string into single terms (mostly English words), convert into lower case, eliminate special characters, stem etc. So basically the same steps I used on the Swiftkey input. Having done that, the logic would look for similarities in all n-grams that are applicable. So if e.g. two words are put in, the logic would start searching in the 3-gram and 2-gram tables. In case of the 3-gram table, the first two arguments (words) would be used like a primary key, the third column would be the potential prediction. Same for the 2-gram, where only the last input word would be used as primary key. The second word of the 2-gram table would be the potential prediction. The same would be done with the personalized n-grams. Here, the simple approach is that any user input would be put as-is into n-gram tables. Maximum input length used for this would be four words. All the matches determied are written into a joint table ("dfStatistics"), which is displayed in tab "Prediction Details and History". How to interpret the tables used is explained in the next section. For the most promising word predicted, I execute steps such as unstemming before displaying it in the output field. If no match can be dertmined, the most frequently used words in the English language are set as default values.
+
+## How to interpret the Information provided in the Applicaton Tabs
+
+The sidebar, the word prediction tab and the "How to use" and "Advanced Documentation" tabs have either been explained in the "How to use" tab, so I won't refer to these in this documentation. Instead, I would like to focus on the ones that may require more explanation, because they might not be fully self-explaining:
+
+### 2-gram until 5-gram:
+
+* line: Just a line number to identify the entry during the process of logic execution (e.g. checking programming problems)
+* frequency: number of times the term(s) has/have been used in the text used for creating the n-gram file
+* term(s): ideally (an) English word(s), but thanks to Twitter et al. theoretically any kind of string people could think of being potentially English (OK, being a bit ironic here)
+* prediction: output term, which might be used as prediction value
+
+### 2-gram Personal until 4-gram Personal:
+
+term1, term2...: Depending on the input term length, these tables are populated with the unchanged input words. Example: input is "What is the". This will be stored in the personal 3-gram table as "What", "is", "the", and in the 2-gram-table as "is", "the".
+
+### Prediction Details and History:
+
+This is the most important table of the application, which accomodates all relevant candidates for determining the most promising term for prediction:
+
+* ngram: shows in which n-gram the match has been found (e.g. "2" indicates the 2-gram table)
+* personal: "0" indicates a match in the non-personalized n-gram tables, "1" indicates a match in the personalized tables
+*frequency: shows the frequency of the matches found in the non-personal n-grams. A value of e.g. 256 indicates that the relevant match has been found 256 times in the text database. For the personal tables, a pre-defined value is provided to give it a very high weight, since for personal values, the real frequency might be very low (e.g. one or two)
+* weight: predefined weights given depending on the n-gram. The higher the "n"-value, the higher the weight. Simple logic behind this: if a match is determined in the 5-gram table, is should be a very precise match, as opposed to a match in te 2-gram table, which is expected to be more general, but comes because of that fact with a generally higher frequency.
+* weighted_frequency: product of the multiplication of frequency and weight
+* line: is the line number of the n-gram table the match has been found (makes text analysis a bit easier)
+* predicted word: the title should be self-explaining, I think. Note that the values are stemmed, so sometimes you might see single characters
+
+Sorting approach to determine the best prediction is quite straightforward: first priority is given to the n-gram. The higher, the better. Second priority: personal table matches over general n-gram table matches. Third priority: weighed frequency. Example: a match is found in the personal 3-gram table, and also in the general 3-gram table. Here, the personal entry is preferred over the general one, no matter the weighted frequency. Second example: no personal matches, but various matches in 3- and 2-gram tables. Here, the hightest-weighted 3-gram entry "wins".
+
+## Thoughts on why I implemented Things the way I did, future Development Options and Link to Github
+
+Some thoughts on the packages used for data processing in R: I have to admit that I am not fully happy with some of the standard packages like tm, RWeka and SnowballC. E.g. unstemming is highly inefficient, which was the reason I programmed my own functions for that. Another example where I struggled with standard functionality was that word stemming in the packages works sometimes very differently from each other. So if forced to use two packages in parallel might lead to inconsistent results, which I found to be very frustrating. But there is thankfully nothing that can't be fixed with a bit of coding.  I also found other packages for word processing, e.g. Quanteda, which might do a way better job. Unfortunately, I didn't have the time to try. But focusing a bit on the positive side: R and Shiny in general offer an abundance of very well-programmed solutions created by an enthusiastic community, and always having kind people - e.g. our mentors - available for support helped me to overcome the obvious obstacles.
+
+The resulting application is with a very high likelihood something I enjoyed realizing, but which will not be developed further. However, here some thoughts on what I would do in case this was a "real" project I would have more time for:
+
+1. **Data preparation is the winning point:** I would spend more time on proper, very clean data preparation and try to use more data
+
+2. **Prediction accuracy:** I would fine-tune the accuracy vs. performance trade-off more thoroughly. However, from my perspective, the current implementation seems to do an already accetable job
+
+3. **Try different packages:** I think I would go for Quanteda instead of tm, and I would define my own stemming routines. The ones of tm and SnowballC cut away too much, creating (unnecessarily) too much ambiguity.
+
+Should you be interested, here the link to the Github repository I use for the project: <https://github.com/ClausWalter/CapstoneDataScience>. Please note that I put everything relevant into it, so you will see quite a lot of files. Best read the Readme.md first to understand the structure.

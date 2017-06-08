@@ -1,0 +1,58 @@
+---
+title: "Capstone Word Prediction User Documentation"
+author: "Claus Walter"
+date: "6 Juni 2017"
+output: html_document
+---
+
+## Purpose of the Application
+
+The purpose of the application is to predict a word based on an input given within a reasonable amount of time. For this application, only English is supported, although the application could be relatively easily extended to any other language.
+
+## What the Application can (and can't) do
+
+First of all some of the more interesting features:
+
+1. It is a learning application - it remembers what you entered and will use that for future predictions!
+
+2. It is relatively fast - although there is certainly a trade-off between speed and accuracy
+
+3. It can handle "odd" input values like e.g. things you would find in tweets or blogs. So you don't necessarily need to stick to Oxford-English ;-)
+
+4. It shows the data it uses for predictions, so you can see it "think" - in a certain way
+
+5. It is small - less than 30 MB, so it can squeeze into almost any device
+
+6. It finds a swearword, it just shows ***** - so it behaves nicely
+
+Some things that might pose a problem:
+
+1. Output is always in lower-case
+
+2. If you use more than the usual spaces in your input string (unless at the end), that might confuse the app
+
+3. The text input taken for prediction is rather old, so if you e.g. use "Trump" as a input term, it might not know it
+
+4. Since most users of this app will be one-time users, the app will forget your personal values as soon as you log off. Sorry for that...
+
+## How to use
+
+Use is very simple: The application consists of the sidebar and several tabs. First, you put a string into the sidebar input field and hit the "Predict" button. In tab "Word Prediction", the output field visible should show a prediction for the next word. Note that if you hit the "Predict" button and you are at that time not on tab "Word Prediction", the app will automatically switch to that tab, so you see the suggestion. This has been implemented as a small convenience item. If you like the prediction, you can use the "Take over" button to add the prediction to your input string. All other tabs are there for advanced users. The content of these tabs is documented under tab "Advanced Documentation".
+
+## How the Predictions works
+
+The principle should be fairly straightforward:
+
+1. Input is provided by the user (and kind of input string in English)
+
+2. The input gets separated into single words (or rather strings)
+
+3. The words get treated as the words that have been used to derive the prediction logic (e.g. stemming)
+
+4. The app searches for similar terms (max. length of four words - if you type in more, it will use just the last four for prediction)
+
+5. The search results are displayed in tab "Prediction History and Details" in a table. Please note that the entries you see here are fully stemmed, so it might look a bit confusing. Refer to the advanced documentation for more details on what exactly is displayed, and in which sequence
+
+6. Final step: the topmost entry delivered by the previous step (first line of the table mentioned in step 5) gets unstemmed, interpunction re-entered, and the entry is shown in the output field. If, however, no result can be determined, the most frequently word used overall will be shown.
+
+For details, please refer to the advanced documentation.

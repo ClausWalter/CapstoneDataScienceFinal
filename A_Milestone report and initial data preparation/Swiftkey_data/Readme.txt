@@ -1,0 +1,1 @@
+Please note that the zip file in this folder is an empty placeholder, which was needed for technical reasons. If you are interested in obtaining the file, please download it from Swiftkey.
